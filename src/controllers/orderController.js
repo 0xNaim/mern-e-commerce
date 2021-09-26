@@ -86,4 +86,19 @@ const updateOrderToPaid = async (req, res) => {
   }
 };
 
-export { addOrderItems, getOrderById, updateOrderToPaid };
+// @desc    Get logged in user orders
+// @route   GET /api/orders/myorders
+// @access  Private
+const getMyOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({ user: req.user._id });
+    if (!orders) {
+      return res.status(404).send({ error: 'There are no orders available' });
+    }
+    res.status(200).send(orders);
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+};
+
+export { addOrderItems, getOrderById, updateOrderToPaid, getMyOrders };

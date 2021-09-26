@@ -114,4 +114,19 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-export { registerUser, authUser, getUserProfile, updateUserProfile };
+// @desc      Get all users
+// @route     GET /api/users
+// @access    Private/Admin
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find({});
+    if (!users)
+      return res.status(404).send({ error: 'There are no users available' });
+
+    res.status(200).send(users);
+  } catch (err) {
+    res.status(404).send({ error: err.message });
+  }
+};
+
+export { registerUser, authUser, getUserProfile, updateUserProfile, getUsers };
