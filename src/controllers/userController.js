@@ -120,8 +120,9 @@ const updateUserProfile = async (req, res) => {
 const getUsers = async (req, res) => {
   try {
     const users = await User.find({});
-    if (!users)
+    if (!users) {
       return res.status(404).send({ error: 'There are no users available' });
+    }
 
     res.status(200).send(users);
   } catch (err) {
