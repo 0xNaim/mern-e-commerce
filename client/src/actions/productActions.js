@@ -1,5 +1,8 @@
 import axios from 'axios';
 import {
+  PRODUCT_DELETE_FAIL,
+  PRODUCT_DELETE_REQUEST,
+  PRODUCT_DELETE_SUCCESS,
   PRODUCT_DETAILS_FAIL,
   PRODUCT_DETAILS_REQUEST,
   PRODUCT_DETAILS_SUCCESS,
@@ -7,6 +10,7 @@ import {
   PRODUCT_LIST_REQUEST,
   PRODUCT_LIST_SUCCESS,
 } from '../constants/productConstants';
+import { logout } from './userActions';
 
 const productsList = () => async (dispatch) => {
   try {
@@ -40,4 +44,37 @@ const productDetails = (id) => async (dispatch) => {
   }
 };
 
-export { productsList, productDetails };
+const deleteProduct = (id) => async (dispatch, getState) => {
+  try {
+    dispatch({
+      type: PRODUCT_DELETE_REQUEST,
+    });
+
+    const {
+      userLogin: { userInfo },
+    } = getState();
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+
+    await axios.delete(`/api/products/${id}`, config);
+
+    dispatch({
+      type: PRODUCT_DELETE_SUCCESS,
+    });
+  } catch (error) {
+    const message = error.response && error.response.data.error;
+    if (message === 'Not authorized') {
+      dispatch(logout());
+    }
+    dispatch({
+      type: PRODUCT_DELETE_FAIL,
+      payload: message,
+    });
+  }
+};
+
+export { productsList, productDetails, deleteProduct };
