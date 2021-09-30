@@ -10,7 +10,7 @@ import {
 } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { productDetails } from '../actions/productActions';
+import { listProductDetails } from '../actions/productActions';
 import Message from '../components/message/Message';
 import Rating from '../components/rating/Rating';
 import Spinner from '../components/spinner/Spinner';
@@ -23,7 +23,7 @@ const ProductScreen = ({ match, history }) => {
   const { loading, product, error } = singleProductDetails;
 
   useEffect(() => {
-    dispatch(productDetails(match.params.id));
+    dispatch(listProductDetails(match.params.id));
   }, [dispatch, match]);
 
   const handleAddToCart = () => {

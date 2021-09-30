@@ -63,6 +63,9 @@ const UserEditScreen = ({ match, history }) => {
 
       <FormContainer>
         <h1 className='my-2'>Edit User</h1>
+        {loadingUpdate && <Spinner />}
+        {errorUpdate && <Message variant='danger'>{errorUpdate}</Message>}
+
         {loading ? (
           <Spinner />
         ) : error ? (

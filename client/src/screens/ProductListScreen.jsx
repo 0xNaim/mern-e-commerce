@@ -2,9 +2,14 @@ import React, { useEffect } from 'react';
 import { Button, Col, Row, Table } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { LinkContainer } from 'react-router-bootstrap';
-import { deleteProduct, productsList } from '../actions/productActions';
+import {
+  createProduct,
+  deleteProduct,
+  productsList,
+} from '../actions/productActions';
 import Message from '../components/message/Message';
 import Spinner from '../components/spinner/Spinner';
+import { PRODUCT_CREATE_RESET } from '../constants/productConstants';
 
 const ProductListScreen = ({ match, history }) => {
   const dispatch = useDispatch();
@@ -12,26 +17,56 @@ const ProductListScreen = ({ match, history }) => {
   const productList = useSelector((state) => state.productList);
   const { loading, error, products } = productList;
 
+  const productDelete = useSelector((state) => state.productDelete);
+  const {
+    loading: loadingDelete,
+    error: errorDelete,
+    success: successDelete,
+  } = productDelete;
+
+  const productCreate = useSelector((state) => state.productCreate);
+  const {
+    loading: loadingCreate,
+    error: errorCreate,
+    success: successCreate,
+    product: createdProduct,
+  } = productCreate;
+
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
 
   useEffect(() => {
-    if (userInfo && userInfo.isAdmin) {
-      dispatch(productsList());
-    } else {
+    dispatch({ type: PRODUCT_CREATE_RESET });
+
+    if (!userInfo || !userInfo.isAdmin) {
       history.push('/login');
     }
-  }, [dispatch, userInfo, history]);
+
+    if (successCreate) {
+      history.push(`/admin/product/${createdProduct._id}/edit`);
+    } else {
+      dispatch(productsList());
+    }
+  }, [
+    dispatch,
+    userInfo,
+    history,
+    createdProduct,
+    successCreate,
+    successDelete,
+  ]);
 
   const handleDeleteProduct = (id) => {
     if (window.confirm('Are you sure to delete this product?')) {
       dispatch(deleteProduct(id));
-      window.location.reload();
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     }
   };
 
-  const handleCreateProduct = (product) => {
-    console.log('Product Created!');
+  const handleCreateProduct = () => {
+    dispatch(createProduct());
   };
 
   return (
@@ -46,6 +81,11 @@ const ProductListScreen = ({ match, history }) => {
           </Button>
         </Col>
       </Row>
+
+      {loadingDelete && <Spinner />}
+      {errorDelete && <Message variant='danger'>{errorDelete}</Message>}
+      {loadingCreate && <Spinner />}
+      {errorCreate && <Message variant='danger'>{errorCreate}</Message>}
 
       {loading ? (
         <Spinner />
