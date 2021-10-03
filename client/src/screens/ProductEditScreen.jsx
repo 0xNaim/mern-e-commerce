@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,6 +19,7 @@ const ProductEditScreen = ({ match, history }) => {
   const [category, setCategory] = useState('');
   const [countInStock, setCountInStock] = useState(0);
   const [image, setImage] = useState('');
+  const [uploading, setUploading] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -64,6 +66,27 @@ const ProductEditScreen = ({ match, history }) => {
         image,
       })
     );
+  };
+
+  const handleUploadFile = async (e) => {
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append('image', file);
+    setUploading(true);
+
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+      const { data } = await axios.post('/api/upload', formData, config);
+      setImage(data);
+      setUploading(false);
+    } catch (err) {
+      console.log(err.message);
+      setUploading(false);
+    }
   };
 
   return (
@@ -150,6 +173,13 @@ const ProductEditScreen = ({ match, history }) => {
                 value={image}
                 onChange={(e) => setImage(e.target.value)}
               />
+              <Form.File
+                id='image-file'
+                label='Choose File'
+                custom
+                onChange={handleUploadFile}
+              />
+              {uploading && <Spinner />}
             </Form.Group>
 
             <Button type='submit' variant='dark' size='sm' className='my-2'>

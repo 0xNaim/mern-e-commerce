@@ -86,6 +86,28 @@ const updateOrderToPaid = async (req, res) => {
   }
 };
 
+// @desc    Update order to delivered
+// @route   GET /api/orders/:id/deliver
+// @access  Private/Admin
+const updateOrderToDelivered = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      throw new Error('Order not found');
+    }
+
+    order.isDelivered = true;
+    order.deliveredAt = Date.now();
+
+    const updatedOrder = await order.save();
+
+    res.status(200).send(updatedOrder);
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+};
+
 // @desc    Get logged in user orders
 // @route   GET /api/orders/myorders
 // @access  Private
@@ -101,4 +123,26 @@ const getMyOrders = async (req, res) => {
   }
 };
 
-export { addOrderItems, getOrderById, updateOrderToPaid, getMyOrders };
+// @desc    Get all orders
+// @route   GET /api/orders
+// @access  Private/Admin
+const getOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({}).populate('user', 'id name');
+    if (!orders) {
+      return res.status(404).send({ error: 'There are no orders available' });
+    }
+    res.status(200).send(orders);
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+};
+
+export {
+  addOrderItems,
+  getOrderById,
+  updateOrderToPaid,
+  updateOrderToDelivered,
+  getMyOrders,
+  getOrders,
+};
