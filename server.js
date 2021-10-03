@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import express from 'express';
+import morgan from 'morgan';
 import path from 'path';
 import connectDB from './src/db/mongoose.js';
 import { errorHandler, notFound } from './src/middleware/errorMiddleware.js';
@@ -11,6 +12,9 @@ import userRoutes from './src/routes/userRoutes.js';
 // express app initialize
 const app = express();
 app.use(express.json());
+
+// morgan initialize
+app.use(morgan('tiny'));
 
 // dotenv config
 dotenv.config();
