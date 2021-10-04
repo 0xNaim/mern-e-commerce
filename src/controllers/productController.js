@@ -5,7 +5,16 @@ import Product from '../models/productModel.js';
 // @access    Public
 const getProducts = async (req, res) => {
   try {
-    const products = await Product.find({});
+    const keyword = req.query.keyword
+      ? {
+          name: {
+            $regex: req.query.keyword,
+            $options: 'i',
+          },
+        }
+      : {};
+
+    const products = await Product.find({ ...keyword });
 
     if (products.length === 0) {
       return res.status(404).send({
