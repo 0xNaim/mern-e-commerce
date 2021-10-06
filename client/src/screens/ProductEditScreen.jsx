@@ -182,7 +182,7 @@ const ProductEditScreen = ({ match, history }) => {
               {uploading && <Spinner />}
             </Form.Group>
 
-            <Button type='submit' variant='dark' size='sm' className='my-2'>
+            <Button type='submit' variant='dark' size='sm' className='mt-3'>
               Update
             </Button>
           </Form>

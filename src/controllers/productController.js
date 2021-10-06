@@ -5,6 +5,9 @@ import Product from '../models/productModel.js';
 // @access    Public
 const getProducts = async (req, res) => {
   try {
+    const pageSize = 10;
+    const page = +req.query.pageNumber || 1;
+
     const keyword = req.query.keyword
       ? {
           name: {
@@ -14,7 +17,10 @@ const getProducts = async (req, res) => {
         }
       : {};
 
-    const products = await Product.find({ ...keyword });
+    const count = await Product.count({ ...keyword });
+    const products = await Product.find({ ...keyword })
+      .limit(pageSize)
+      .skip(pageSize * (page - 1));
 
     if (products.length === 0) {
       return res.status(404).send({
@@ -22,7 +28,9 @@ const getProducts = async (req, res) => {
       });
     }
 
-    res.status(200).send(products);
+    res
+      .status(200)
+      .send({ products, page, pages: Math.ceil(count / pageSize) });
   } catch (err) {
     res.status(404).send({ error: err.message });
   }
@@ -156,6 +164,18 @@ const createProductReview = async (req, res) => {
   }
 };
 
+// @desc    Ger top rated product
+// @route   GET /api/products/top
+// @access  Public
+const getTopProducts = async (req, res) => {
+  try {
+    const products = await Product.find({}).sort({ rating: -1 }).limit(3);
+    res.status(200).send(products);
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+};
+
 export {
   getProducts,
   getProductById,
@@ -163,4 +183,5 @@ export {
   createProduct,
   updateProduct,
   createProductReview,
+  getTopProducts,
 };
