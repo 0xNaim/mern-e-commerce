@@ -15,6 +15,7 @@ import {
   listProductDetails,
 } from '../actions/productActions';
 import Message from '../components/message/Message';
+import Meta from '../components/meta/Meta';
 import Rating from '../components/rating/Rating';
 import Spinner from '../components/spinner/Spinner';
 import { PRODUCT_CREATE_REVIEW_RESET } from '../constants/productConstants';
@@ -67,6 +68,7 @@ const ProductScreen = ({ match, history }) => {
         <Message variant='danger'>{error}</Message>
       ) : (
         <>
+          <Meta title={product.name} />
           <Row>
             <Col md={6}>
               <Image src={product.image} alt={product.name} fluid />
